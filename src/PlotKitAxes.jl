@@ -19,7 +19,31 @@ module PlotKitAxes
 # submodules
 
 # The included modules are sorted by dependency.
+using Cairo
 using PlotKitCairo
+
+# MakeTicks, MakeAxisMap and DrawAxis are independent
+# and only depend on Box, Point (and Cairo for DrawAxis)
+include("maketicks.jl")
+using .MakeTicks
+
+include("makeaxismap.jl")
+using .MakeAxisMap
+
+include("drawaxis.jl")
+using .DrawAxis
+
+include("axisdrawable.jl")
+using .AxisDrawable
+
+
+#include("basic.jl")
+#using .Basic
+
+#include("axistools.jl")
+#using .AxisTools
+
+
 
 ##############################################################################
 function reexport(m)
@@ -30,6 +54,10 @@ end
 
 
 reexport(PlotKitCairo)
+reexport(MakeTicks)
+reexport(MakeAxisMap)
+reexport(DrawAxis)
+reexport(AxisDrawable)
 
 
 
