@@ -26,6 +26,9 @@ struct AxisMap
     finv
 end
 
+(ax::AxisMap)(p::Point) = ax.f(p)
+(ax::AxisMap)(plist::Array{Point}) = ax.f.(plist)
+
 
 
 # construct f mapping data coords to window coords
