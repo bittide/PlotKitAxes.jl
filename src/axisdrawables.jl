@@ -1,5 +1,5 @@
 
-module AxisDrawable
+module AxisDrawables
 
 using Cairo
 using ..DrawAxis
@@ -7,7 +7,7 @@ using ..MakeTicks: Ticks
 using ..MakeAxisMap: AxisMap, @plotfns
 using ..PlotKitCairo: Point, Drawable, Box, PlotKitCairo, rect
 
-export Axis
+#export Axis
 
 #
 # We use Axis to draw the axis, in addition to the axisstyle.
@@ -30,17 +30,14 @@ export Axis
 #
 # We use AxisMap to draw the graph on the axis.
 #
-mutable struct Axis
+
+
+
+mutable struct AxisDrawable 
     dw::Drawable
-    #width            # in pixels, including margins
-    #height           # in pixels, including margins
-    ax::AxisMap      # provides function mapping data coords to pixels
-    box::Box         # extents of the axis in data coordinates
-    ticks::Ticks
-    as::AxisStyle
-    yoriginatbottom
-    windowbackgroundcolor
-    drawbackground   # bool
+    axis::Axis
+    drawbackground
+    backgroundcolor
 end
 
 

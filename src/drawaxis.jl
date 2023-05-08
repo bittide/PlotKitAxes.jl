@@ -2,10 +2,11 @@
 module DrawAxis
 
 using Cairo
-using ..PlotKitCairo: Point, Color, LineStyle, source, set_linestyle
-using ..MakeAxisMap: @plotfns
+using ..PlotKitCairo: Box, Point, Color, LineStyle, source, set_linestyle
+using ..MakeAxisMap: @plotfns, AxisMap
+using ..MakeTicks: Ticks
 
-export AxisStyle, drawaxis
+export Axis, AxisStyle, drawaxis
 
 ##############################################################################
 
@@ -29,6 +30,14 @@ Base.@kwdef mutable struct AxisStyle
     drawvgridlines = true
     drawhgridlines = true
     title = ""
+end
+
+mutable struct Axis
+    ax::AxisMap      # provides function mapping data coords to pixels
+    box::Box         # extents of the axis in data coordinates
+    ticks::Ticks
+    as::AxisStyle
+    yoriginatbottom
 end
 
 
@@ -99,6 +108,10 @@ function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle)
          horizontal = "center")
     
 end
+
+
+drawaxis(ctx::CairoContext, axis::Axis) = drawaxis(ctx, axis.ax, axis.ticks, axis.box, axis.as)
+
 
 
 end

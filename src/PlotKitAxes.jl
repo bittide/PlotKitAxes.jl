@@ -22,8 +22,7 @@ module PlotKitAxes
 using Cairo
 using PlotKitCairo
 
-# MakeTicks, MakeAxisMap and DrawAxis are independent
-# and only depend on Box, Point (and Cairo for DrawAxis)
+# MakeTicks, MakeAxisMap and DrawAxis are ordered by dependency
 include("maketicks.jl")
 using .MakeTicks
 
@@ -33,8 +32,8 @@ using .MakeAxisMap
 include("drawaxis.jl")
 using .DrawAxis
 
-include("axisdrawable.jl")
-using .AxisDrawable
+include("axisdrawables.jl")
+using .AxisDrawables
 
 
 #include("basic.jl")
@@ -57,7 +56,7 @@ reexport(PlotKitCairo)
 reexport(MakeTicks)
 reexport(MakeAxisMap)
 reexport(DrawAxis)
-reexport(AxisDrawable)
+reexport(AxisDrawables)
 
 
 
