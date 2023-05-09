@@ -33,53 +33,53 @@ export AxisDrawable
 
 abstract type AxisDrawable <: Drawable end
 
-mutable struct AxisImageDrawable <: AxisDrawable
+Base.@kwdef mutable struct AxisImageDrawable <: AxisDrawable
     surface
     ctx
     width
     height
     fname
     axis::Axis
-    drawbackground
-    backgroundcolor
+    drawbackground = true
+    backgroundcolor = Color(:white)
 end
 
-mutable struct AxisPDFDrawable <: AxisDrawable
+Base.@kwdef mutable struct AxisPDFDrawable <: AxisDrawable
     surface
     ctx
     width
     height
     fname
     axis::Axis
-    drawbackground
-    backgroundcolor
+    drawbackground = true
+    backgroundcolor = Color(:white)
 end
 
-mutable struct AxisSVGDrawable <: AxisDrawable
+Base.@kwdef mutable struct AxisSVGDrawable <: AxisDrawable
     surface
     ctx
     width
     height
     fname
     axis::Axis
-    drawbackground
-    backgroundcolor
+    drawbackground = true
+    backgroundcolor = Color(:white)
 end
 
-mutable struct AxisRecorderDrawable <: AxisDrawable
+Base.@kwdef mutable struct AxisRecorderDrawable <: AxisDrawable
     surface
     ctx
     width
     height
     axis::Axis
-    drawbackground
-    backgroundcolor
+    drawbackground = true
+    backgroundcolor = Color(:white)
 end
 
-AxisDrawable(axis::Axis, dw::ImageDrawable) = AxisImageDrawable(dw.surface, dw.ctx, dw.width, dw.height, dw.fname, axis, true, Color(:white))
-AxisDrawable(axis::Axis, dw::PDFDrawable) = AxisPDFDrawable(dw.surface, dw.ctx, dw.width, dw.height, dw.fname, axis, true, Color(:white))
-AxisDrawable(axis::Axis, dw::SVGDrawable) = AxisSVGDrawable(dw.surface, dw.ctx, dw.width, dw.height, dw.fname, axis, true, Color(:white))
-AxisDrawable(axis::Axis, dw::RecorderDrawable) = AxisRecorderDrawable(dw.surface, dw.ctx, dw.width, dw.height, dw.fname, axis, true, Color(:white))
+AxisDrawable(axis::Axis, dw::ImageDrawable; kw...) = AxisImageDrawable(; surface = dw.surface, ctx = dw.ctx, width = dw.width, height = dw.height, fname = dw.fname, axis = axis, kw...)
+AxisDrawable(axis::Axis, dw::PDFDrawable; kw...) = AxisPDFDrawable(; surface = dw.surface, ctx = dw.ctx, width = dw.width, height = dw.height, fname = dw.fname, axis = axis, kw...)
+AxisDrawable(axis::Axis, dw::SVGDrawable; kw...) = AxisSVGDrawable(; surface = dw.surface, ctx = dw.ctx, width = dw.width, height = dw.height, fname = dw.fname, axis = axis, kw...)
+AxisDrawable(axis::Axis, dw::RecorderDrawable; kw...) = AxisRecorderDrawable(; surface = dw.surface, ctx = dw.ctx, width = dw.width, height = dw.height, axis = axis, kw...)
 
 # close has different behavior for ImageDrawable vs other Drawables
 ImageDrawable(dw::AxisImageDrawable) = ImageDrawable(dw.surface, dw.ctx, dw.width, dw.height, dw.fname)
@@ -115,8 +115,9 @@ end
 
 # TODO: circle radius shouldbe in axis coords too? What about non-uniform x,y scaling
 
+PlotKitCairo.line(ad::AxisDrawable, p::Array{Point}; kwargs...) =  PlotKitCairo.line(ad.ctx, ad.axis.ax(p); kwargs...)
 
-for f in (:line, :circle, :text)
+for f in (:circle, :text)
     @eval function PlotKitCairo.$f(ad::AxisDrawable, p, args...; kwargs...)
         PlotKitCairo.$f(ad.ctx, ad.axis.ax(p), args...; kwargs...)
     end

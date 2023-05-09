@@ -1,5 +1,14 @@
 
 
+module AxisBuilder
+
+using ..PlotKitCairo: Drawable, Box, Point, Drawable, Color, inbox, expand_box, scale_box
+using ..AxisDrawables: AxisDrawable, AxisDrawables
+using ..DrawAxis: Axis, DrawAxis, AxisStyle
+using ..MakeTicks: Ticks, get_tick_extents
+using ..MakeAxisMap: AxisMap, @plotfns
+
+
 #
 # AxisOptions is passed to the Axis constructor,
 # which creates the Axis object above. It contains the style
@@ -42,7 +51,7 @@ end
 
 ##############################################################################
 
-function Axis(p, ao::AxisOptions)
+function AxisDrawables.AxisDrawable(p, ao::AxisOptions; fname = nothing)
     
     ignore_data_outside_this_box = getbox(ao)
     
@@ -72,14 +81,21 @@ function Axis(p, ao::AxisOptions)
     ax = AxisMap(wh..., margins(ao), axisbox,
                  ao.axisequal, ao.yoriginatbottom)
   
-    axis = Axis(wh..., ax, axisbox, ticks, ao.axisstyle,
-                ao.yoriginatbottom, ao.windowbackgroundcolor,
-                ao.drawbackground)
-    return axis
+    #    axis = Axis(wh..., ax, axisbox, ticks, ao.axisstyle,
+    #                ao.yoriginatbottom, ao.windowbackgroundcolor,
+    #                ao.drawbackground)
+
+    axis = Axis(ax, axisbox, ticks, ao.axisstyle, ao.yoriginatbottom)
+    dw = Drawable(wh...; fname)
+    return AxisDrawable(axis, dw; drawbackground = ao.drawbackground,
+                        backgroundcolor = ao.windowbackgroundcolor)
+
 end
 
-Axis(ao::AxisOptions) = Axis(missing, ao)
-    
+AxisDrawables.AxisDrawable(ao::AxisOptions; fname = nothing) = AxisDrawable(missing, ao; fname)
+AxisDrawables.AxisDrawable(p; fname = nothing, kw...) = AxisDrawable(p, parse_axis_options(; kw...); fname)
+AxisDrawables.AxisDrawable(; fname = nothing, kw...) = AxisDrawable(missing; kw..., fname)
+
 
 ##############################################################################
 
@@ -95,9 +111,6 @@ function parse_axis_options(; kw...)
     return ao
 end
     
-
-Axis(p; kw...) = Axis(p, parse_axis_options(; kw...))
-Axis(; kw...) = Axis(missing; kw...)
 
 ##############################################################################
 
@@ -128,4 +141,98 @@ function fit_box_around_data(p, box0::Box)
     box1 = iffinite(box0, boxtmp)
 end
 
+# if x = [p1,p2,p3]  returns x
+# if x = [ [p1,p2],[p3,p4,p5]] returns [p1,p2,p3,p4,p5]
+#
+# should work for arbitrary dimensional array
+flat_list_of_points(x::Vector{Point}) = x
+function flat_list_of_points(slist)
+    # nomissing is a list whoses elements are Vector{Point}
+    nomissing = Vector{Point}[series for series in skipmissing(slist)]
+    # flat is a Vector{Point}
+    flat = reduce(vcat, nomissing)
+end
+function iffinite(r::Number, d::Number)
+    if isfinite(r)
+        return r
+    end
+    return d
+end
+
+# if requested limits are finite, use them
+function iffinite(a::Box, b::Box)
+    xmin = iffinite(a.xmin, b.xmin)
+    xmax = iffinite(a.xmax, b.xmax)
+    ymin = iffinite(a.ymin, b.ymin)
+    ymax = iffinite(a.ymax, b.ymax)
+    return Box(xmin, xmax, ymin, ymax)
+end
+
+remove_data_outside_box(plist, b::Box) = Point[p for p in plist if inbox(p, b)]
+
+function smallest_box_containing_data(plist)
+    xmin = minimum(a.x for a in plist)
+    xmax = maximum(a.x for a in plist)
+    ymin = minimum(a.y for a in plist)
+    ymax = maximum(a.y for a in plist)
+    return Box(xmin, xmax, ymin, ymax)
+end
+
+
 ##############################################################################
+# utilities
+
+
+ifnotmissing(x::Missing, y) = y
+ifnotmissing(x, y) = x
+
+function ifnotmissing(a::Box, b::Box)
+    return Box(ifnotmissing(a.xmin, b.xmin),
+               ifnotmissing(a.xmax, b.xmax),
+               ifnotmissing(a.ymin, b.ymin),
+               ifnotmissing(a.ymax, b.ymax))
+end
+
+
+function ifnotmissingticks(a::Ticks, b::Ticks)
+    return Ticks(ifnotmissing(a.xticks, b.xticks),
+                 ifnotmissing(a.xtickstrings, b.xtickstrings),
+                 ifnotmissing(a.yticks, b.yticks),
+                 ifnotmissing(a.ytickstrings, b.ytickstrings))
+end
+
+margins(a) = (a.lmargin, a.rmargin, a.tmargin, a.bmargin)
+
+
+
+
+##############################################################################
+# keyword args
+
+function symsplit(s::Symbol, a::String)
+    n = length(a)
+    st = string(s)
+    if length(st) > n && st[1:length(a)] == a
+        return true, Symbol(st[length(a)+1:end])
+    end
+    return false, :nosuchsymbol
+end
+
+function setoptions!(d, prefix, kwargs...)
+    for (key, value) in kwargs
+        match, tail = symsplit(key, prefix)
+        if match && tail in fieldnames(typeof(d))
+            setfield!(d, tail, value)
+        end
+    end
+end
+
+##############################################################################
+
+getbox(a) = Box(a.xmin, a.xmax, a.ymin, a.ymax)
+
+##############################################################################
+
+
+
+end

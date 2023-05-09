@@ -31,13 +31,6 @@ export Axis, AxisMap, AxisOptions, AxisStyle, Layout, Ticks, best_labels, best_t
 (ax::AxisMap)(plist::Array{Point}) = ax.f.(plist)
 
 
-function ifnotmissingticks(a::Ticks, b::Ticks)
-    return Ticks(ifnotmissing(a.xticks, b.xticks),
-                 ifnotmissing(a.xtickstrings, b.xtickstrings),
-                 ifnotmissing(a.yticks, b.yticks),
-                 ifnotmissing(a.ytickstrings, b.ytickstrings))
-end
-
 
 
 ##############################################################################
