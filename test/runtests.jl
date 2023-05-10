@@ -126,6 +126,7 @@ end
 end
 ##############################################################################
 
+<<<<<<< HEAD
 module TestAxisDrawables
 using Cairo
 using PlotKitCairo
@@ -225,3 +226,5 @@ TestAxisDrawables.main()
 
 using .TestAxisBuilder
 TestAxisBuilder.main()
+
+
