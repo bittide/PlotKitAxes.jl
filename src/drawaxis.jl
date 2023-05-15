@@ -2,11 +2,11 @@
 module DrawAxis
 
 using Cairo
-using ..PlotKitCairo: Box, Point, Color, LineStyle, source, set_linestyle
+using ..PlotKitCairo: Box, Point, Color, Drawable, LineStyle, source, set_linestyle
 using ..MakeAxisMap: @plotfns, AxisMap
 using ..MakeTicks: Ticks
 
-export Axis, AxisStyle, drawaxis
+export Axis, AxisStyle, drawaxis, setclipbox
 
 ##############################################################################
 
@@ -111,7 +111,15 @@ end
 
 
 drawaxis(ctx::CairoContext, axis::Axis) = drawaxis(ctx, axis.ax, axis.ticks, axis.box, axis.as)
+drawaxis(dw::Drawable, args...) = drawaxis(dw.ctx, args...)
 
-
+function setclipbox(ctx::CairoContext, ax::AxisMap, box::Box)
+    @plotfns ax
+    xmin, xmax, ymin, ymax = box.xmin, box.xmax, box.ymin, box.ymax
+    Cairo.rectangle(ctx, rfx(xmin), rfy(ymin), rfx(xmax)-rfx(xmin), rfy(ymax)-rfy(ymin))
+    Cairo.clip(ctx)
+    Cairo.new_path(ctx)
+end
+setclipbox(dw::Drawable, ax::AxisMap, box::Box) = setclipbox(dw.ctx, ax, box)
 
 end

@@ -2,7 +2,7 @@
 module AxisDrawables
 
 using Cairo
-using ..DrawAxis: Axis, drawaxis, DrawAxis
+using ..DrawAxis: Axis, drawaxis, DrawAxis, setclipbox
 using ..MakeTicks: Ticks
 using ..MakeAxisMap: AxisMap, @plotfns
 using ..PlotKitCairo: Color, Point, Drawable, Box, PlotKitCairo, rect, ImageDrawable, PDFDrawable, SVGDrawable, RecorderDrawable
@@ -100,15 +100,8 @@ function DrawAxis.drawaxis(ad::AxisDrawable)
 end
 
 
-# This should be factored differently
-function setclipbox(ad::AxisDrawable)
-    @plotfns ad.axis.ax
-    box = ad.axis.box
-    xmin, xmax, ymin, ymax = box.xmin, box.xmax, box.ymin, box.ymax
-    Cairo.rectangle(ad.ctx, rfx(xmin), rfy(ymin), rfx(xmax)-rfx(xmin), rfy(ymax)-rfy(ymin))
-    Cairo.clip(ad.ctx)
-    Cairo.new_path(ad.ctx)
-end
+
+DrawAxis.setclipbox(ad::AxisDrawable) = setclipbox(ad.ctx, ad.axis.ax, ad.axis.box)
 
 ##############################################################################
 # drawing functions
