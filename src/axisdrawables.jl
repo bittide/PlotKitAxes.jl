@@ -107,7 +107,7 @@ DrawAxis.setclipbox(ad::AxisDrawable) = setclipbox(ad.ctx, ad.axis.ax, ad.axis.b
 # drawing functions
 
 
-# TODO: circle radius shouldbe in axis coords too? What about non-uniform x,y scaling
+# return scalefactor. If r is in axis units, then r*scalefactor is in pixels
 function getscalefactor(ad::AxisDrawable; scaletype = :x)
     scalefactor = 1.0
     if scaletype == :x
