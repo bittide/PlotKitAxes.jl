@@ -7,7 +7,7 @@ using ..MakeTicks: Ticks
 using ..MakeAxisMap: AxisMap, @plotfns
 using ..PlotKitCairo: Color, Point, Drawable, Box, PlotKitCairo, rect, ImageDrawable, PDFDrawable, SVGDrawable, RecorderDrawable
 
-export AxisDrawable
+export AxisDrawable, getscalefactor
 
 #
 # We use Axis to draw the axis, in addition to the axisstyle.
@@ -108,14 +108,34 @@ DrawAxis.setclipbox(ad::AxisDrawable) = setclipbox(ad.ctx, ad.axis.ax, ad.axis.b
 
 
 # TODO: circle radius shouldbe in axis coords too? What about non-uniform x,y scaling
+function getscalefactor(ad::AxisDrawable; scaletype = :x)
+    scalefactor = 1.0
+    if scaletype == :x
+        scalefactor = ad.axis.ax.fx(1) - ad.axis.ax.fx(0)
+    elseif scaletype == :y
+        scalefactor = ad.axis.ax.fy(1) - ad.axis.ax.fy(0)
+    end
+    return scalefactor
+end
+
 
 PlotKitCairo.line(ad::AxisDrawable, p::Array{Point}; kwargs...) =  PlotKitCairo.line(ad.ctx, ad.axis.ax(p); kwargs...)
 
-for f in (:circle, :text)
-    @eval function PlotKitCairo.$f(ad::AxisDrawable, p, args...; kwargs...)
-        PlotKitCairo.$f(ad.ctx, ad.axis.ax(p), args...; kwargs...)
-    end
+function PlotKitCairo.circle(ad::AxisDrawable, p, r; scaletype = :x, kw...)
+    scalefactor = getscalefactor(ad; scaletype)
+    PlotKitCairo.circle(ad.ctx, ad.axis.ax(p), r * scalefactor; kw...)
 end
+      
+function PlotKitCairo.text(ad::AxisDrawable, p, fsize, color, txt; scaletype = :x, kw...)
+    scalefactor = getscalefactor(ad; scaletype)
+    PlotKitCairo.text(ad.ctx, ad.axis.ax(p), fsize * scalefactor, color, txt; kw...)
+end
+
+#for f in (:text, )
+#    @eval function PlotKitCairo.$f(ad::AxisDrawable, p, args...; kwargs...)
+#        PlotKitCairo.$f(ad.ctx, ad.axis.ax(p), args...; kwargs...)
+#    end
+#end
 
 
 # for functions with two arguments of type Point
