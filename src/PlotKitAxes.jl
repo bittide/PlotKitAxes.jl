@@ -38,12 +38,6 @@ using .AxisDrawables
 include("axisbuilder.jl")
 using .AxisBuilder
 
-#include("basic.jl")
-#using .Basic
-
-#include("axistools.jl")
-#using .AxisTools
-
 
 
 ##############################################################################

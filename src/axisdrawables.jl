@@ -7,7 +7,7 @@ using ..MakeTicks: Ticks
 using ..MakeAxisMap: AxisMap, @plotfns
 using ..PlotKitCairo: Color, Point, Drawable, Box, PlotKitCairo, rect, ImageDrawable, PDFDrawable, SVGDrawable, RecorderDrawable
 
-export AxisDrawable, getscalefactor
+export AxisDrawable, getscalefactor, drawbackground
 
 #
 # We use Axis to draw the axis, in addition to the axisstyle.
@@ -90,12 +90,15 @@ RecorderDrawable(dw::AxisRecorderDrawable) = RecorderDrawable(dw.surface, dw.ctx
 PlotKitCairo.paint(ctx::CairoContext, r::AxisRecorderDrawable, args...) = PlotKitCairo.paint(ctx, RecorderDrawable(r), args...)
 PlotKitCairo.save(r::AxisRecorderDrawable, args...) = PlotKitCairo.save(r, args...)
 
-
-# also draw background
-function DrawAxis.drawaxis(ad::AxisDrawable)
+function drawbackground(ad::AxisDrawable)
     if ad.drawbackground
         rect(ad.ctx, Point(0,0), Point(ad.width, ad.height); fillcolor = ad.backgroundcolor)
     end
+end
+
+# also draw background
+function DrawAxis.drawaxis(ad::AxisDrawable)
+    drawbackground(ad)
     drawaxis(ad.ctx, ad.axis)
 end
 
@@ -106,6 +109,7 @@ DrawAxis.setclipbox(ad::AxisDrawable) = setclipbox(ad.ctx, ad.axis.ax, ad.axis.b
 ##############################################################################
 # drawing functions
 
+getscalefactor(dw::Drawable; scaletype = :x) = 1.0
 
 # return scalefactor. If r is in axis units, then r*scalefactor is in pixels
 function getscalefactor(ad::AxisDrawable; scaletype = :x)

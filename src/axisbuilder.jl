@@ -8,7 +8,7 @@ using ..DrawAxis: Axis, DrawAxis, AxisStyle
 using ..MakeTicks: Ticks, get_tick_extents
 using ..MakeAxisMap: AxisMap, @plotfns
 
-
+export setoptions!
 #
 # AxisOptions is passed to the Axis constructor,
 # which creates the Axis object above. It contains the style
