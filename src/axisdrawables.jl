@@ -88,7 +88,7 @@ PlotKitCairo.close(dw::AxisImageDrawable) = PlotKitCairo.close(ImageDrawable(dw)
 # paint and save only apply to RecorderDrawables
 RecorderDrawable(dw::AxisRecorderDrawable) = RecorderDrawable(dw.surface, dw.ctx, dw.width, dw.height)
 PlotKitCairo.paint(ctx::CairoContext, r::AxisRecorderDrawable, args...) = PlotKitCairo.paint(ctx, RecorderDrawable(r), args...)
-PlotKitCairo.save(r::AxisRecorderDrawable, args...) = PlotKitCairo.save(r, args...)
+PlotKitCairo.save(r::AxisRecorderDrawable, args...) = PlotKitCairo.save(RecorderDrawable(r), args...)
 
 function drawbackground(ad::AxisDrawable)
     if ad.drawbackground
