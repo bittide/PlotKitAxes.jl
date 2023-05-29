@@ -10,6 +10,7 @@ function main()
         @test main4()
         @test main5()
         @test main6()
+        @test main7()
     end
 end
 
@@ -132,12 +133,15 @@ function main6()
 end
 
 
+# overlays on basic plot
 function main7()
-    x1 = -0.1:0.1:1.8
-    y1 = x1.*x1
-    x2 = -0.2:0.05:1.4
-    y2 = x2.*(x2 .- 0.6) .* (x2 .- 1)
-    fig = plot( [pzip(x1, y1), pzip(x2, y2)] )
-    qsave(fig, "basic2.pdf")
-end
+    println("main7")
+    x = -0.1:0.1:1.3
+    y = x.*x
+    d = plot(x,y)
 
+    line(d, Point(0, 0), Point(1, 1); linestyle = LineStyle( Color(:black), 2))
+    line(d.ctx, Point(0, 0), Point(400, 300); linestyle = LineStyle( Color(:blue), 2))
+    save(d, plotpath("test_axisbuilder7.pdf"))
+    return true
+end
