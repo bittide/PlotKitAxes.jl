@@ -3,7 +3,7 @@ module MakeTicks
 
 using ..PlotKitCairo: Box
 
-export Ticks, best_ticks, best_labels
+export Ticks, best_ticks, best_labels, get_tick_extents
 
 # Ticks and its constructor
 

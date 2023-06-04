@@ -19,6 +19,9 @@ function main()
         @test main13()
         @test main14()
         @test main15()
+        @test main16()
+        @test main17()
+        @test main18()
     end
 end
 getoptions(;kw...) = kw
@@ -268,4 +271,68 @@ function main15()
     f6 = plot(x, y; axisbox_xmax = 1.3, tickbox_xmax = 1.3)
     save(hvbox([f1 f2 f3; f4 f5 f6]), plotpath("test_axisbuilder15.pdf"))
     return true 
+end
+
+
+# beziers
+function main16()
+    println("main16")
+
+    ad = AxisDrawable(; xmin=0, xmax = 29, ymin = 0, ymax = 3,
+                      yoriginatbottom = true, axisequal = false)
+
+    p = Point(1,1)
+    q = Point(6,2)
+    th1 = pi/6
+    th2 = pi/6
+    
+    # bad choice, angles wrong in axis space
+    bezier = Bezier(p, q, th1, th2, 0.3)
+    curve(ad, bezier; linestyle = LineStyle( Color(:black), 4))
+    a = point(bezier, 0.3)
+    circle(ad, a, 0.2;fillcolor = Color(:red))
+
+    # good choice, angles correct in pixel space
+    ax = ad.axis.ax
+    bezier = Bezier(ax(p), ax(q), th1, th2, 0.3)
+    curve(ad.ctx, bezier; linestyle = LineStyle(Color(:cyan), 1))
+    a = point(bezier, 0.3)
+    circle(ad.ctx, a, 5; fillcolor = Color(:green))
+    
+    save(ad, plotpath("test_axisbuilder16.pdf"))
+    return true
+end
+
+# circles
+function main17()
+    println("main17")
+    ad = AxisDrawable(; xmin=-2, xmax=15, ymin=-2, ymax=20)
+    x = 1
+    for i = 1:10
+        circle(ad, Point(x, 5), 10; scaletype = :none, fillcolor = Color(:green))
+        x += 1
+    end
+    for i = 1:10
+        circle(ad, Point(i, 2), 10; scaletype = :none, fillcolor = Color(:red))
+    end
+    save(ad, plotpath("test_axisbuilder17.pdf"))
+    return true
+end
+
+# offset two plots
+function main18()
+    println("main18")
+    
+    x1 = -0.1:0.1:1.3
+    y1 = x1.*x1
+    d1 = plot(x1, y1)
+
+    x2 = -0.2:0.05:1.4
+    y2 = x2.*(x2 .- 0.6) .* (x2 .- 1)
+    d2 = plot(x2, y2)
+
+    ad = offset(d1, d2, 400, 200)
+    save(ad, plotpath("test_axisbuilder18.pdf"))
+    return true
+
 end

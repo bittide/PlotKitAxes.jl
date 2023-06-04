@@ -5,7 +5,7 @@ using Cairo
 using ..DrawAxis: Axis, drawaxis, DrawAxis, setclipbox
 using ..MakeTicks: Ticks
 using ..MakeAxisMap: AxisMap, @plotfns
-using ..PlotKitCairo: Color, Point, Drawable, Box, PlotKitCairo, rect, ImageDrawable, PDFDrawable, SVGDrawable, RecorderDrawable
+using ..PlotKitCairo: Bezier, Color, Point, Drawable, Box, PlotKitCairo, rect, ImageDrawable, PDFDrawable, SVGDrawable, RecorderDrawable, curve
 
 export AxisDrawable, getscalefactor, drawbackground
 
@@ -157,5 +157,10 @@ for f in (:curve,)
     end
 end
 
+function PlotKitCairo.curve(ad::AxisDrawable, b::Bezier; kw...)
+    ax = ad.axis.ax
+    b2 = Bezier(ax(b.p0), ax(b.p1), ax(b.p2), ax(b.p3))
+    curve(ad.ctx, b2; kw...)
+end
 
 end
