@@ -11,12 +11,21 @@ function main()
         @test main5()
         @test main6()
         @test main7()
+        @test main8()
+        @test main9()
+        @test main10()
+        @test main11()
+        @test main12()
+        @test main13()
+        @test main14()
+        @test main15()
     end
 end
-
+getoptions(;kw...) = kw
 pzip(a,b) = Point.(zip(a,b))
-function plot(x, y; kw...)
-    data = pzip(x,y)
+plot(x, y; kw...) = plot(pzip(x,y); kw...)
+
+function plot(data; kw...)
     ad = AxisDrawable(data; kw... )
     drawaxis(ad)
     setclipbox(ad)
@@ -144,4 +153,119 @@ function main7()
     line(d.ctx, Point(0, 0), Point(400, 300); linestyle = LineStyle( Color(:blue), 2))
     save(d, plotpath("test_axisbuilder7.pdf"))
     return true
+end
+
+# many subplots
+function main8()
+    println("main8")
+    fns = [sin, cos, exp, tan, sec, sinc]
+    x = collect(-1:0.01:1)
+    fs = [ plot(x, a.(x)) for a in fns ]
+    save(hvbox(stack(fs, 3)), plotpath("test_axisbuilder8.pdf"))
+    return true
+end
+
+
+# set marker styles
+function main9()
+    println("main9")
+    x = -0.3:0.1:1.3
+    y = x.*x
+    data = pzip(x,y)
+    ad = AxisDrawable(data)
+    drawaxis(ad)
+    setclipbox(ad)
+    line(ad, data; linestyle = LineStyle(Color(:blue),2))
+    for p in data
+        circle(ad, p, 10; scaletype = :none, linestyle=LineStyle(Color(:red),2),
+               fillcolor = Color(:cyan))
+    end
+    save(ad, plotpath("test_axisbuilder9.pdf"))
+    return true
+end
+
+# change the axis style
+function main10()
+    println("main10")
+    data = Point[(x, x*x) for x in -0.1:0.01:1.85]
+    opts = getoptions(; axisstyle_edgelinestyle = LineStyle(0.5 * Color(:white), 2),
+                      axisstyle_gridlinestyle = LineStyle(Color(0.5,0.5,0.7), 1),
+                      axisstyle_backgroundcolor = Color(:white),
+                      axisstyle_drawbox = true,
+                      windowbackgroundcolor = 0.9 * Color(:white)
+                      )
+    ad = plot(data; opts...)
+    line(ad, Point(1,1), Point(4, 3); linestyle = LineStyle(Color(:green),2))
+    save(ad, plotpath("test_axisbuilder10.pdf"))
+    return true
+end
+
+
+# draw on existing plot
+function main11()
+    println("main11")
+    data = Point[(x, x*x) for x in -0.1:0.01:1.85]
+    d = plot(data)
+    line(d, Point(1,1), Point(4, 3);linestyle = LineStyle(Color(:green), 2))
+    save(d, plotpath("test_axisbuilder11.pdf"))
+    return true
+end
+
+
+
+# basic two plots on same graph
+function main12()
+    println("main12")
+    x1 = -2:0.1:2
+    y1 = x1
+    x2 = -0.5:0.1:0.7
+    y2 = x2.*x2 .-3
+    ad = AxisDrawable([pzip(x1, y1); pzip(x2, y2)])
+    drawaxis(ad)
+    setclipbox(ad)
+    line(ad, pzip(x1, y1); linestyle = LineStyle(Color(:red),1))
+    line(ad, pzip(x2, y2); linestyle = LineStyle(Color(:blue),1))
+    save(ad, plotpath("test_axisbuilder12.pdf"))
+    return true
+end
+
+
+function main13()
+    println("main13")
+    ad = AxisDrawable(; xmin = -10, xmax = 20, ymin=-20, ymax=20)
+    drawaxis(ad)
+    setclipbox(ad)
+    circle(ad, Point(0,0), 50; scaletype = :none, 
+           linestyle = LineStyle(Color(:black), 4))
+    save(ad, plotpath("test_axisbuilder13.pdf"))
+    return true
+end
+
+# checking out limits
+function main14()
+    println("main14")
+    x = collect(-2:0.01:2)
+    y = x.*x
+    f1 = plot(x, y)
+    f2 = plot(x, y; xmin = -1, xmax = 1.5, ymax=5)
+    f3 = plot(x, y; xmin = -1, xmax = 6.5)
+    f4 = plot(x, y; ymin = -1, ymax = 10)
+    save(hvbox([f1 f2; f3 f4]), plotpath("test_axisbuilder14.pdf"))
+    return true
+end
+
+# checking out limits more
+function main15()
+    println("main15")
+    x = collect(-1:0.01:2)
+    y = x.*x
+    f1 = plot(x, y)
+    f2 = plot(x, y; xmax = 2.7) 
+    f3 = plot(x, y; tickbox_xmax = 2.7, axisbox_xmax = 2.7)
+
+    f4 = plot(x, y; tickbox_xmax = 1.3)
+    f5 = plot(x, y; axisbox_xmax = 1.3)
+    f6 = plot(x, y; axisbox_xmax = 1.3, tickbox_xmax = 1.3)
+    save(hvbox([f1 f2 f3; f4 f5 f6]), plotpath("test_axisbuilder15.pdf"))
+    return true 
 end
