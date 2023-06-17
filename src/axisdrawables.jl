@@ -76,6 +76,11 @@ Base.@kwdef mutable struct AxisRecorderDrawable <: AxisDrawable
     backgroundcolor = Color(:white)
 end
 
+PlotKitCairo.Drawable(ad::AxisImageDrawable) = ImageDrawable(ad.surface, ad.ctx, ad.width, ad.height, ad.fname)
+PlotKitCairo.Drawable(ad::AxisPDFDrawable) = PDFDrawable(ad.surface, ad.ctx, ad.width, ad.height, ad.fname)
+PlotKitCairo.Drawable(ad::AxisSVGDrawable) = SVGDrawable(ad.surface, ad.ctx, ad.width, ad.height, ad.fname)
+PlotKitCairo.Drawable(ad::AxisRecorderDrawable) = RecorderDrawable(ad.surface, ad.ctx, ad.width, ad.height)
+
 AxisDrawable(axis::Axis, dw::ImageDrawable; kw...) = AxisImageDrawable(; surface = dw.surface, ctx = dw.ctx, width = dw.width, height = dw.height, fname = dw.fname, axis = axis, kw...)
 AxisDrawable(axis::Axis, dw::PDFDrawable; kw...) = AxisPDFDrawable(; surface = dw.surface, ctx = dw.ctx, width = dw.width, height = dw.height, fname = dw.fname, axis = axis, kw...)
 AxisDrawable(axis::Axis, dw::SVGDrawable; kw...) = AxisSVGDrawable(; surface = dw.surface, ctx = dw.ctx, width = dw.width, height = dw.height, fname = dw.fname, axis = axis, kw...)
