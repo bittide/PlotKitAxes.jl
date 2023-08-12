@@ -38,6 +38,10 @@ mutable struct Axis
     ticks::Ticks
     as::AxisStyle
     yoriginatbottom
+    width
+    height
+    drawwindowbackground
+    windowbackgroundcolor
 end
 
 

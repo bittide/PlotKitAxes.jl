@@ -51,8 +51,7 @@ end
 
 ##############################################################################
 
-function AxisDrawables.AxisDrawable(p, ao::AxisOptions; fname = nothing)
-    
+function DrawAxis.Axis(p, ao::AxisOptions)
     ignore_data_outside_this_box = getbox(ao)
     
     # tickbox is set to a box that contains the data
@@ -75,26 +74,42 @@ function AxisDrawables.AxisDrawable(p, ao::AxisOptions; fname = nothing)
 
     # set window width/height based on axis limits
     # if asked to do so
-    wh = set_window_size_from_data(ao.width, ao.height, axisbox, margins(ao),
+    width, height = set_window_size_from_data(ao.width, ao.height, axisbox, margins(ao),
                                    ao.widthfromdata, ao.heightfromdata)
 
-    ax = AxisMap(wh..., margins(ao), axisbox,
+    ax = AxisMap(width, height, margins(ao), axisbox,
                  ao.axisequal, ao.yoriginatbottom)
   
     #    axis = Axis(wh..., ax, axisbox, ticks, ao.axisstyle,
     #                ao.yoriginatbottom, ao.windowbackgroundcolor,
     #                ao.drawbackground)
 
-    axis = Axis(ax, axisbox, ticks, ao.axisstyle, ao.yoriginatbottom)
-    dw = Drawable(wh...; fname)
-    return AxisDrawable(axis, dw; drawbackground = ao.drawbackground,
-                        backgroundcolor = ao.windowbackgroundcolor)
+    axis = Axis(ax, axisbox, ticks, ao.axisstyle, ao.yoriginatbottom, width, height,
+                ao.drawbackground, ao.windowbackgroundcolor)
+    return axis
+end
 
+function AxisDrawables.AxisDrawable(axis::Axis; fname = nothing)
+    # The call to Drawable starts the interaction with Cairo
+    dw = Drawable(axis.width, axis.height; fname)
+    return AxisDrawable(axis, dw)
+end
+
+                                    
+function AxisDrawables.AxisDrawable(p, ao::AxisOptions; fname = nothing)
+    axis = Axis(p, ao)
+    return AxisDrawable(axis; fname)
 end
 
 AxisDrawables.AxisDrawable(ao::AxisOptions; fname = nothing) = AxisDrawable(missing, ao; fname)
 AxisDrawables.AxisDrawable(p; fname = nothing, kw...) = AxisDrawable(p, parse_axis_options(; kw...); fname)
 AxisDrawables.AxisDrawable(; fname = nothing, kw...) = AxisDrawable(missing; kw..., fname)
+
+DrawAxis.Axis(ao::AxisOptions) = Axis(missing, ao)
+DrawAxis.Axis(p, kw...) = Axis(p, parse_axis_options(; kw...))
+DrawAxis.Axis(; kw...) = Axis(missing, parse_axis_options(; kw...))
+
+
 
 
 ##############################################################################

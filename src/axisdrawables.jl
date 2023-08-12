@@ -40,8 +40,8 @@ Base.@kwdef mutable struct AxisImageDrawable <: AxisDrawable
     height
     fname
     axis::Axis
-    drawbackground = true
-    backgroundcolor = Color(:white)
+#    drawbackground = true
+#    backgroundcolor = Color(:white)
 end
 
 Base.@kwdef mutable struct AxisPDFDrawable <: AxisDrawable
@@ -51,8 +51,8 @@ Base.@kwdef mutable struct AxisPDFDrawable <: AxisDrawable
     height
     fname
     axis::Axis
-    drawbackground = true
-    backgroundcolor = Color(:white)
+#    drawbackground = true
+#    backgroundcolor = Color(:white)
 end
 
 Base.@kwdef mutable struct AxisSVGDrawable <: AxisDrawable
@@ -62,8 +62,8 @@ Base.@kwdef mutable struct AxisSVGDrawable <: AxisDrawable
     height
     fname
     axis::Axis
-    drawbackground = true
-    backgroundcolor = Color(:white)
+#    drawbackground = true
+#   backgroundcolor = Color(:white)
 end
 
 Base.@kwdef mutable struct AxisRecorderDrawable <: AxisDrawable
@@ -72,8 +72,8 @@ Base.@kwdef mutable struct AxisRecorderDrawable <: AxisDrawable
     width
     height
     axis::Axis
-    drawbackground = true
-    backgroundcolor = Color(:white)
+#    drawbackground = true
+#    backgroundcolor = Color(:white)
 end
 
 PlotKitCairo.Drawable(ad::AxisImageDrawable) = ImageDrawable(ad.surface, ad.ctx, ad.width, ad.height, ad.fname)
@@ -96,8 +96,8 @@ PlotKitCairo.paint(ctx::CairoContext, r::AxisRecorderDrawable, args...) = PlotKi
 PlotKitCairo.save(r::AxisRecorderDrawable, args...) = PlotKitCairo.save(RecorderDrawable(r), args...)
 
 function drawbackground(ad::AxisDrawable)
-    if ad.drawbackground
-        rect(ad.ctx, Point(0,0), Point(ad.width, ad.height); fillcolor = ad.backgroundcolor)
+    if ad.axis.drawwindowbackground
+        rect(ad.ctx, Point(0,0), Point(ad.width, ad.height); fillcolor = ad.axis.windowbackgroundcolor)
     end
 end
 
