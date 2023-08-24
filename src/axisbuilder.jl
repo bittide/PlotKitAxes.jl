@@ -106,7 +106,7 @@ AxisDrawables.AxisDrawable(p; fname = nothing, kw...) = AxisDrawable(p, parse_ax
 AxisDrawables.AxisDrawable(; fname = nothing, kw...) = AxisDrawable(missing; kw..., fname)
 
 DrawAxis.Axis(ao::AxisOptions) = Axis(missing, ao)
-DrawAxis.Axis(p, kw...) = Axis(p, parse_axis_options(; kw...))
+DrawAxis.Axis(p; kw...) = Axis(p, parse_axis_options(; kw...))
 DrawAxis.Axis(; kw...) = Axis(missing, parse_axis_options(; kw...))
 
 
