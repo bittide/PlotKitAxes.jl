@@ -8,7 +8,7 @@ using ..DrawAxis: Axis, DrawAxis, AxisStyle
 using ..MakeTicks: Ticks, get_tick_extents
 using ..MakeAxisMap: AxisMap, @plotfns
 
-export setoptions!, smallest_box_containing_data
+export AxisOptions, setoptions!, smallest_box_containing_data
 #
 # AxisOptions is passed to the Axis constructor,
 # which creates the Axis object above. It contains the style
@@ -134,9 +134,11 @@ function set_window_size_from_data(width, height, b::Box,
                                    widthfromdata, heightfromdata)
     if widthfromdata != 0
         width = (b.xmax - b.xmin) * widthfromdata + lmargin + rmargin
+        width = Int(round(width))
     end
     if heightfromdata != 0
         height = (b.ymax - b.ymin) * heightfromdata + tmargin + bmargin
+        height = Int(round(height))
     end
     return width, height
 end
