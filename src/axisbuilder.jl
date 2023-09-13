@@ -8,7 +8,7 @@ using ..DrawAxis: Axis, DrawAxis, AxisStyle
 using ..MakeTicks: Ticks, get_tick_extents
 using ..MakeAxisMap: AxisMap, @plotfns
 
-export AxisOptions, setoptions!, smallest_box_containing_data
+export AxisOptions, allowed_kws, setoptions!, smallest_box_containing_data
 #
 # AxisOptions is passed to the Axis constructor,
 # which creates the Axis object above. It contains the style
@@ -243,6 +243,16 @@ function setoptions!(d, prefix, kwargs...)
         end
     end
 end
+
+# For a type T defined using @kwdef, this function returns the fieldnames
+# which can be sent as kw arguments to its constructor
+# So you can call 
+#
+#  T(; allowed_kws(T, kw)...)
+#
+# when kw is supplied from the kwargs of a function call
+#
+allowed_kws(T, kw) = Dict(a => kw[a] for a in keys(kw) if a in fieldnames(T))
 
 ##############################################################################
 
