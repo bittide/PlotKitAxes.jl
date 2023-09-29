@@ -35,6 +35,9 @@ using .DrawAxis
 include("axisdrawables.jl")
 using .AxisDrawables
 
+# include("dataset.jl")
+# using .DataSet
+
 include("axisbuilder.jl")
 using .AxisBuilder
 
@@ -53,6 +56,7 @@ reexport(MakeTicks)
 reexport(MakeAxisMap)
 reexport(DrawAxis)
 reexport(AxisDrawables)
+#reexport(DataSet)
 reexport(AxisBuilder)
 
 
