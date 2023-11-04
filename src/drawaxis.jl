@@ -46,7 +46,7 @@ end
 
 
 #    box::Box         # extents of the axis in data coordinates
-function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle)
+function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle, yoriginatbottom)
     if !as.drawaxis
         return
     end
@@ -75,7 +75,11 @@ function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle)
         end
         if xt>=xmin && xt<=xmax
             if as.drawxlabels
-                text(ctx, Point(fx(xt), fy(ymin) + as.xtickverticaloffset),
+                ypos = fy(ymin) + as.xtickverticaloffset
+                if !yoriginatbottom
+                    ypos = fy(ymin) - as.xtickverticaloffset + 0.7 * as.fontsize
+                end
+                text(ctx, Point(fx(xt), ypos),
                      as.fontsize, as.fontcolor, xtickstrings[i];
                      horizontal = "center")
             end
@@ -114,7 +118,7 @@ function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle)
 end
 
 
-drawaxis(ctx::CairoContext, axis::Axis) = drawaxis(ctx, axis.ax, axis.ticks, axis.box, axis.as)
+drawaxis(ctx::CairoContext, axis::Axis) = drawaxis(ctx, axis.ax, axis.ticks, axis.box, axis.as, axis.yoriginatbottom)
 drawaxis(dw::Drawable, args...) = drawaxis(dw.ctx, args...)
 
 function setclipbox(ctx::CairoContext, ax::AxisMap, box::Box)
