@@ -38,6 +38,7 @@ mutable struct Axis
     ticks::Ticks
     as::AxisStyle
     yoriginatbottom
+    xticksatright
     width
     height
     drawwindowbackground
@@ -46,7 +47,7 @@ end
 
 
 #    box::Box         # extents of the axis in data coordinates
-function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle, yoriginatbottom)
+function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle, yoriginatbottom, xticksatright)
     if !as.drawaxis
         return
     end
@@ -97,7 +98,12 @@ function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle, yorigin
         end
         if yt>=ymin && yt<=ymax
             if as.drawylabels
-                text(ctx, Point(fx(xmin) + as.ytickhorizontaloffset, fy(yt)),
+                xpos = fx(xmin) + as.ytickhorizontaloffset
+                if xticksatright
+                    xpos = fx(xmax) - as.ytickhorizontaloffset
+                end
+                             
+                text(ctx, Point(xpos, fy(yt)),
                      as.fontsize, as.fontcolor, ytickstrings[i];
                      horizontal = "right", vertical = "center")
             end
@@ -118,7 +124,8 @@ function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle, yorigin
 end
 
 
-drawaxis(ctx::CairoContext, axis::Axis) = drawaxis(ctx, axis.ax, axis.ticks, axis.box, axis.as, axis.yoriginatbottom)
+drawaxis(ctx::CairoContext, axis::Axis) = drawaxis(ctx, axis.ax, axis.ticks, axis.box, axis.as, axis.yoriginatbottom,
+                                                   axis.xticksatright)
 drawaxis(dw::Drawable, args...) = drawaxis(dw.ctx, args...)
 
 function setclipbox(ctx::CairoContext, ax::AxisMap, box::Box)

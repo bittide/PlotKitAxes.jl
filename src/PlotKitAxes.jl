@@ -41,7 +41,8 @@ using .AxisDrawables
 include("axisbuilder.jl")
 using .AxisBuilder
 
-
+include("colorbar.jl")
+using .ColorBar
 
 ##############################################################################
 function reexport(m)
@@ -58,6 +59,7 @@ reexport(DrawAxis)
 reexport(AxisDrawables)
 #reexport(DataSet)
 reexport(AxisBuilder)
+reexport(ColorBar)
 
 
 

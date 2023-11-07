@@ -8,7 +8,7 @@ using ..DrawAxis: Axis, DrawAxis, AxisStyle
 using ..MakeTicks: Ticks, get_tick_extents
 using ..MakeAxisMap: AxisMap, @plotfns
 
-export AxisOptions, allowed_kws, setoptions!, smallest_box_containing_data
+export AxisOptions, allowed_kws, colorbar, setoptions!, smallest_box_containing_data
 #
 # AxisOptions is passed to the Axis constructor,
 # which creates the Axis object above. It contains the style
@@ -39,6 +39,7 @@ Base.@kwdef mutable struct AxisOptions
     xidealnumlabels = 10
     yidealnumlabels = 10
     yoriginatbottom = true
+    xticksatright = false
     axisequal = false
     windowbackgroundcolor = Color(:white)
     drawbackground = true
@@ -84,7 +85,7 @@ function DrawAxis.Axis(p, ao::AxisOptions)
     #                ao.yoriginatbottom, ao.windowbackgroundcolor,
     #                ao.drawbackground)
 
-    axis = Axis(ax, axisbox, ticks, ao.axisstyle, ao.yoriginatbottom, width, height,
+    axis = Axis(ax, axisbox, ticks, ao.axisstyle, ao.yoriginatbottom, ao.xticksatright, width, height,
                 ao.drawbackground, ao.windowbackgroundcolor)
     return axis
 end
@@ -258,7 +259,6 @@ allowed_kws(T, kw) = Dict(a => kw[a] for a in keys(kw) if a in fieldnames(T))
 
 getbox(a) = Box(a.xmin, a.xmax, a.ymin, a.ymax)
 
-##############################################################################
 
 
 

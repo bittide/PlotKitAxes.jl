@@ -146,6 +146,13 @@ end
 #    end
 #end
 
+PlotKitCairo.linear_pattern(ad::AxisDrawable, p1::Point, p2::Point) = PlotKitCairo.linear_pattern(ad.axis.ax(p1), ad.axis.ax(p2))
+
+function PlotKitCairo.rect(ad::AxisDrawable, p::Point, wh::Point; kw...)
+    widthheight = ad.axis.ax(wh) - ad.axis.ax(Point(0,0))
+    rect(ad.ctx, ad.axis.ax(p), widthheight; kw...)
+end
+
 
 # for functions with two arguments of type Point
 for f in (:line,)
