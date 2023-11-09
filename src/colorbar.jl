@@ -16,6 +16,8 @@ function colorbar(g::Gradient; cmin = 0, cmax = 1, kw...)
                       axisstyle_drawxlabels = false,
                       axisstyle_ytickhorizontaloffset = -26,
                       yidealnumlabels = 6,
+                      axisbox_ymin = cmin,
+                      axisbox_ymax = cmax,
                       xticksatright = true, kw...)
     drawaxis(ad)
     setclipbox(ad)
