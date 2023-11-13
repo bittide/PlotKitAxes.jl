@@ -5,7 +5,7 @@ using Cairo
 using ..DrawAxis: Axis, drawaxis, DrawAxis, setclipbox
 using ..MakeTicks: Ticks
 using ..MakeAxisMap: AxisMap, @plotfns
-using ..PlotKitCairo: Bezier, Color, Point, Drawable, Box, PlotKitCairo, rect, ImageDrawable, PDFDrawable, SVGDrawable, RecorderDrawable, curve
+using ..PlotKitCairo: Bezier, Color, Pik, Point, Drawable, Box, PlotKitCairo, rect, ImageDrawable, PDFDrawable, SVGDrawable, RecorderDrawable, curve, drawimage
 
 export AxisDrawable, getscalefactor, drawbackground
 
@@ -151,6 +151,10 @@ PlotKitCairo.linear_pattern(ad::AxisDrawable, p1::Point, p2::Point) = PlotKitCai
 function PlotKitCairo.rect(ad::AxisDrawable, p::Point, wh::Point; kw...)
     widthheight = ad.axis.ax(wh) - ad.axis.ax(Point(0,0))
     rect(ad.ctx, ad.axis.ax(p), widthheight; kw...)
+end
+
+function PlotKitCairo.drawimage(ad::AxisDrawable, pik::Pik, b::Box)
+    PlotKitCairo.drawimage(ad.ctx, pik, Box(ad.axis.ax.fx(b.xmin), ad.axis.ax.fx(b.xmax), ad.axis.ax.fy(b.ymin), ad.axis.ax.fy(b.ymax)))
 end
 
 
