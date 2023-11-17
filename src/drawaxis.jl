@@ -23,6 +23,7 @@ Base.@kwdef mutable struct AxisStyle
     backgroundcolor = Color(:bluegray)
     gridlinestyle = LineStyle(Color(:white), 1)
     fontsize = 13
+    fontname = "Sans"
     fontcolor = Color(:black)
     drawxlabels = true
     drawylabels = true
@@ -82,7 +83,7 @@ function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle, yorigin
                 end
                 text(ctx, Point(fx(xt), ypos),
                      as.fontsize, as.fontcolor, xtickstrings[i];
-                     horizontal = "center")
+                     fname = as.fontname, horizontal = "center")
             end
         end
     end
@@ -105,7 +106,7 @@ function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle, yorigin
                              
                 text(ctx, Point(xpos, fy(yt)),
                      as.fontsize, as.fontcolor, ytickstrings[i];
-                     horizontal = "right", vertical = "center")
+                     fname = as.fontname, horizontal = "right", vertical = "center")
             end
         end
     end
@@ -119,7 +120,7 @@ function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle, yorigin
         Cairo.stroke(ctx)
     end
     text(ctx, Point(fx((xmin+xmax)/2), fy(ymax) + 15), as.fontsize, as.fontcolor, as.title;
-         horizontal = "center")
+         fname = as.fontname, horizontal = "center")
     
 end
 
