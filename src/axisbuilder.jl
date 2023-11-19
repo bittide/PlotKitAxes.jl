@@ -8,7 +8,18 @@ using ..DrawAxis: Axis, DrawAxis, AxisStyle
 using ..MakeTicks: Ticks, get_tick_extents
 using ..MakeAxisMap: AxisMap, @plotfns
 
-export AxisOptions, allowed_kws, colorbar, setoptions!, smallest_box_containing_data
+export AxisOptions, PointList, allowed_kws, colorbar, input, setoptions!, smallest_box_containing_data
+
+
+mutable struct PointList
+    points::Vector{Point}
+end
+
+# input returns a vector of pointlists
+input(data::Vector{Point}) = [PointList(data)]
+input(data::Array{Vector{Point}}) = [PointList(p) for p in data[:]]
+
+
 #
 # AxisOptions is passed to the Axis constructor,
 # which creates the Axis object above. It contains the style
@@ -52,16 +63,28 @@ end
 
 ##############################################################################
 
-function DrawAxis.Axis(p, ao::AxisOptions)
+
+function DrawAxis.Axis(p::PointList, ao::AxisOptions)
     ignore_data_outside_this_box = getbox(ao)
     
     # tickbox is set to a box that contains the data
     # so if ignore_data_outside_this_box specifies limits on x,
     # then the data is used to determine limits on y
     # and these limits go into tickbox
+    #
     boxtmp = fit_box_around_data(p, ignore_data_outside_this_box)
+    return Axis(boxtmp, ao)
+end
+
+function DrawAxis.Axis(ao::AxisOptions)
+    boxtmp = iffinite(getbox(ao), Box(0,1,0,1))
+    return Axis(boxtmp, ao)
+end
+
+
+function DrawAxis.Axis(databox::Box, ao::AxisOptions)
     tickbox = ifnotmissing(ao.tickbox,
-                           scale_box(expand_box(boxtmp, ao.xdatamargin, ao.ydatamargin),
+                           scale_box(expand_box(databox, ao.xdatamargin, ao.ydatamargin),
                                      ao.xwidenfactor, ao.ywidenfactor))
 
     # tickbox used to define the minimum area which the ticks
@@ -90,6 +113,10 @@ function DrawAxis.Axis(p, ao::AxisOptions)
     return axis
 end
 
+
+
+
+
 function AxisDrawables.AxisDrawable(axis::Axis; fname = nothing)
     # The call to Drawable starts the interaction with Cairo
     dw = Drawable(axis.width, axis.height; fname)
@@ -101,14 +128,22 @@ function AxisDrawables.AxisDrawable(p, ao::AxisOptions; fname = nothing)
     axis = Axis(p, ao)
     return AxisDrawable(axis; fname)
 end
+                                    
+function AxisDrawables.AxisDrawable(ao::AxisOptions; fname = nothing)
+    axis = Axis(ao)
+    return AxisDrawable(axis; fname)
+end
+                
+             
 
-AxisDrawables.AxisDrawable(ao::AxisOptions; fname = nothing) = AxisDrawable(missing, ao; fname)
+
+
 AxisDrawables.AxisDrawable(p; fname = nothing, kw...) = AxisDrawable(p, parse_axis_options(; kw...); fname)
-AxisDrawables.AxisDrawable(; fname = nothing, kw...) = AxisDrawable(missing; kw..., fname)
+AxisDrawables.AxisDrawable(; fname = nothing, kw...) = AxisDrawable(parse_axis_options(; kw...); fname)
 
-DrawAxis.Axis(ao::AxisOptions) = Axis(missing, ao)
+DrawAxis.Axis(p::Vector{PointList}, ao::AxisOptions) = Axis(flat(p), ao)
 DrawAxis.Axis(p; kw...) = Axis(p, parse_axis_options(; kw...))
-DrawAxis.Axis(; kw...) = Axis(missing, parse_axis_options(; kw...))
+DrawAxis.Axis(; kw...) = Axis(parse_axis_options(; kw...))
 
 
 
@@ -146,15 +181,16 @@ end
 
 ##############################################################################
 
+flat(pl::PointList) = pl
+flat(pl::Vector{PointList}) = PointList(reduce(vcat, a.points for a in pl))
   
 # used when you don't have any data and want to ask
 # for specific limits on the axis
-fit_box_around_data(p::Missing, box0::Box) = iffinite(box0, Box(0,1,0,1))
+#fit_box_around_data(p::Missing, box0::Box) = iffinite(box0, Box(0,1,0,1))
 
 
-function fit_box_around_data(p, box0::Box)
-    flattened_data = flat_list_of_points(p)
-    truncdata = remove_data_outside_box(flattened_data, box0)
+function fit_box_around_data(p::PointList, box0::Box)
+    truncdata = remove_data_outside_box(p, box0)
     boxtmp = smallest_box_containing_data(truncdata)
     box1 = iffinite(box0, boxtmp)
 end
@@ -163,13 +199,16 @@ end
 # if x = [ [p1,p2],[p3,p4,p5]] returns [p1,p2,p3,p4,p5]
 #
 # should work for arbitrary dimensional array
-flat_list_of_points(x::Vector{Point}) = x
-function flat_list_of_points(slist)
-    # nomissing is a list whoses elements are Vector{Point}
-    nomissing = Vector{Point}[series for series in skipmissing(slist)]
-    # flat is a Vector{Point}
-    flat = reduce(vcat, nomissing)
-end
+#flat_list_of_points(x::Vector{Point}) = x
+#function flat_list_of_points(slist)
+#    # nomissing is a list whoses elements are Vector{Point}
+#    nomissing = Vector{Point}[series for series in skipmissing(slist)]
+#    # flat is a Vector{Point}
+#    flat = reduce(vcat, nomissing)
+#end
+
+
+
 function iffinite(r::Number, d::Number)
     if isfinite(r)
         return r
@@ -186,13 +225,13 @@ function iffinite(a::Box, b::Box)
     return Box(xmin, xmax, ymin, ymax)
 end
 
-remove_data_outside_box(plist, b::Box) = Point[p for p in plist if inbox(p, b)]
+remove_data_outside_box(pl::PointList, box::Box) = PointList(Point[a for a in pl.points if inbox(a, box)])
 
-function smallest_box_containing_data(plist)
-    xmin = minimum(a.x for a in plist)
-    xmax = maximum(a.x for a in plist)
-    ymin = minimum(a.y for a in plist)
-    ymax = maximum(a.y for a in plist)
+function smallest_box_containing_data(pl::PointList)
+    xmin = minimum(a.x for a in pl.points)
+    xmax = maximum(a.x for a in pl.points)
+    ymin = minimum(a.y for a in pl.points)
+    ymax = maximum(a.y for a in pl.points)
     return Box(xmin, xmax, ymin, ymax)
 end
 
