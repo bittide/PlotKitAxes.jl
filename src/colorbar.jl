@@ -1,7 +1,7 @@
 
 module ColorBar
 
-using ..PlotKitCairo: Gradient, Point, add_color_stop, destroy, linear_pattern, rect
+using ..PlotKitCairo: Box, Gradient, Point, add_color_stop, destroy, linear_pattern, rect
 using ..AxisDrawables: AxisDrawable
 using ..DrawAxis: drawaxis, setclipbox
 
@@ -12,7 +12,7 @@ export colorbar, categoricalcolorbar
 
 
 function colorbar(g::Gradient; cmin = 0, cmax = 1, kw...)
-    ad = AxisDrawable([Point(0,cmin), Point(1,cmax)]; width = 200,
+    ad = AxisDrawable(Box(0, 1, cmin, cmax); width = 200,
                       axisstyle_drawxlabels = false,
                       axisstyle_ytickhorizontaloffset = -26,
                       yidealnumlabels = 6,
@@ -41,7 +41,7 @@ end
 # the axis ranges exactly from cmin to cmax
 #
 function categoricalcolorbar(colors, values; cmin = 0, cmax = 1, kw...)
-    ad = AxisDrawable([Point(0,cmin), Point(1,cmax)]; width = 200,
+    ad = AxisDrawable(Box(0, 1, cmin, cmax); width = 200,
                       axisstyle_drawxlabels = false,
                       axisstyle_ytickhorizontaloffset = -26,
                       yidealnumlabels = length(values)-1,
