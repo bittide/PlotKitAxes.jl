@@ -1,3 +1,5 @@
 [deps]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
+Cairo = "159f3aea-2a34-519c-b102-8c37f9878175"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+PlotKitCairo = "7ee0c3d4-a3be-4a4f-8af9-251da1807123"

@@ -29,7 +29,7 @@ pzip(a,b) = Point.(zip(a,b))
 plot(x, y; kw...) = plot(pzip(x,y); kw...)
 
 function plot(data; kw...)
-    ad = AxisDrawable(data; kw... )
+    ad = AxisDrawable(PointList(data); kw... )
     drawaxis(ad)
     setclipbox(ad)
     line(ad, data; linestyle = LineStyle(Color(:red),1))
@@ -46,7 +46,7 @@ function main1()
     data = [Point(x, x.*x/10) for x = 0:0.1:10]
 
     # drawing
-    ad = AxisDrawable(data; fname )
+    ad = AxisDrawable(PointList(data); fname )
     drawaxis(ad)
     line(ad, data; linestyle = LineStyle(Color(:red),1))
     close(ad)
@@ -60,7 +60,7 @@ function main2()
     
     fname = plotpath("test_axisbuilder2.pdf")
     data = [Point(x, x.*x) for x = -0.1:0.1:2.85]
-    ad = AxisDrawable(data; fname )
+    ad = AxisDrawable(PointList(data); fname )
     drawaxis(ad)
     for p in data
         circle(ad, p, 2; fillcolor = 0.5*Color(:white))
@@ -92,7 +92,7 @@ function main3()
     fname = plotpath("test_axisbuilder3.pdf")
     dw = Drawable(width, height; fname)
     rect(dw, Point(0,0), Point(width, height); fillcolor =  windowbackgroundcolor)
-    drawaxis(dw, ax, ticks, box, as)
+    drawaxis(dw, ax, ticks, box, as, true, false)
     setclipbox(dw, ax, box)
     line(dw, ax.(Point.(zip(x, y))); linestyle=LineStyle(Color(:blue), 1))
     close(dw)
@@ -118,7 +118,7 @@ function main5()
     x2 = -0.2:0.05:1.4
     y2 = x2.*(x2 .- 0.6) .* (x2 .- 1)
 
-    ad = AxisDrawable([pzip(x1, y1); pzip(x2, y2)])
+    ad = AxisDrawable([PointList(pzip(x1, y1)); PointList(pzip(x2, y2))])
     drawaxis(ad)
     setclipbox(ad)
     line(ad, pzip(x1, y1); linestyle = LineStyle(Color(:red),1))
@@ -164,7 +164,7 @@ function main8()
     fns = [sin, cos, exp, tan, sec, sinc]
     x = collect(-1:0.01:1)
     fs = [ plot(x, a.(x)) for a in fns ]
-    save(hvbox(stack(fs, 3)), plotpath("test_axisbuilder8.pdf"))
+    save(hvbox(stacked(fs, 3)), plotpath("test_axisbuilder8.pdf"))
     return true
 end
 
@@ -175,7 +175,7 @@ function main9()
     x = -0.3:0.1:1.3
     y = x.*x
     data = pzip(x,y)
-    ad = AxisDrawable(data)
+    ad = AxisDrawable(PointList(data))
     drawaxis(ad)
     setclipbox(ad)
     line(ad, data; linestyle = LineStyle(Color(:blue),2))
@@ -223,7 +223,7 @@ function main12()
     y1 = x1
     x2 = -0.5:0.1:0.7
     y2 = x2.*x2 .-3
-    ad = AxisDrawable([pzip(x1, y1); pzip(x2, y2)])
+    ad = AxisDrawable([PointList(pzip(x1, y1)); PointList(pzip(x2, y2))])
     drawaxis(ad)
     setclipbox(ad)
     line(ad, pzip(x1, y1); linestyle = LineStyle(Color(:red),1))

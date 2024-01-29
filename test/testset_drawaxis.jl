@@ -17,6 +17,7 @@ function main1()
 
     margins = (80,80,80,80)  # l,r,t,b
     yoriginatbottom = true
+    xticksatright = false
     axisequal = false
     box = Box(0,1,0,1)
     axismap = AxisMap(width, height, margins, box, axisequal, yoriginatbottom)
@@ -25,7 +26,7 @@ function main1()
 
     # drawing
     dw = Drawable(width, height; fname)
-    drawaxis(dw.ctx, axismap, ticks, box, as)
+    drawaxis(dw.ctx, axismap, ticks, box, as, yoriginatbottom, xticksatright)
     close(dw)
     return true
 end
@@ -37,12 +38,16 @@ function main2()
 
     margins = (80,80,80,80)  # l,r,t,b
     yoriginatbottom = true
+    xticksatright = false
     axisequal = false
+    drawbackground = true
+    windowbackgroundcolor = Color(:white)
     box = Box(0,1,0,1)
     axismap = AxisMap(width, height, margins, box, axisequal, yoriginatbottom)
     ticks = Ticks(box, 10, 10)
     as = AxisStyle()
-    axis = Axis(axismap, box, ticks, as, yoriginatbottom)
+    axis = Axis(axismap, box, ticks, as, yoriginatbottom, xticksatright,
+                width, height, drawbackground, windowbackgroundcolor)
 
     # drawing
     dw = Drawable(width, height; fname)
@@ -69,7 +74,11 @@ function main3()
     as = AxisStyle()
     axismap = AxisMap(width, height, margins, box, false, true)
     yoriginatbottom = true
-    axis = Axis(axismap, box, ticks, as, yoriginatbottom)
+    xticksatright = false
+    drawbackground = true
+    windowbackgroundcolor = Color(:white)
+    axis = Axis(axismap, box, ticks, as, yoriginatbottom, xticksatright,
+                width, height, drawbackground, windowbackgroundcolor)
     dw = Drawable(width, height)
     rect(dw.ctx, Point(0,0), Point(width, height); fillcolor =  windowbackgroundcolor)
     drawaxis(dw.ctx, axis)
@@ -90,13 +99,16 @@ function main4()
     width = 800
     height = 600
     margins = (80, 80, 80, 80)
+    yoriginatbottom = true
+    xticksatright = false
+
     windowbackgroundcolor = Color(:white)
     as = AxisStyle()
     ax = AxisMap(width, height, margins, range, false, true)
 
     d = Drawable(width, height)
     rect(d, Point(0,0), Point(width, height); fillcolor =  windowbackgroundcolor)
-    drawaxis(d, ax, ticks, range, as)
+    drawaxis(d, ax, ticks, range, as, yoriginatbottom, xticksatright)
     setclipbox(d, ax, range)
     line(d,  ax.(Point.(zip(x, y))); linestyle=LineStyle(Color(:black), 1))
 

@@ -2,7 +2,7 @@
 module AxisDrawables
 
 using Cairo
-using ..DrawAxis: Axis, drawaxis, DrawAxis, setclipbox
+using ..DrawAxis: Axis, drawaxis, drawaxisbox, DrawAxis, setclipbox
 using ..MakeTicks: Ticks
 using ..MakeAxisMap: AxisMap, @plotfns
 using ..PlotKitCairo: Bezier, Color, Pik, Point, Drawable, Box, PlotKitCairo, rect, ImageDrawable, PDFDrawable, SVGDrawable, RecorderDrawable, curve, drawimage
@@ -107,6 +107,9 @@ function DrawAxis.drawaxis(ad::AxisDrawable)
     drawaxis(ad.ctx, ad.axis)
 end
 
+function DrawAxis.drawaxisbox(ad::AxisDrawable)
+    drawaxisbox(ad.ctx, ad.axis)
+end
 
 
 DrawAxis.setclipbox(ad::AxisDrawable) = setclipbox(ad.ctx, ad.axis.ax, ad.axis.box)
@@ -153,8 +156,8 @@ function PlotKitCairo.rect(ad::AxisDrawable, p::Point, wh::Point; kw...)
     rect(ad.ctx, ad.axis.ax(p), widthheight; kw...)
 end
 
-function PlotKitCairo.drawimage(ad::AxisDrawable, pik::Pik, b::Box)
-    PlotKitCairo.drawimage(ad.ctx, pik, Box(ad.axis.ax.fx(b.xmin), ad.axis.ax.fx(b.xmax), ad.axis.ax.fy(b.ymin), ad.axis.ax.fy(b.ymax)))
+function PlotKitCairo.drawimage(ad::AxisDrawable, pik::Pik, b::Box; kw...)
+    PlotKitCairo.drawimage(ad.ctx, pik, Box(ad.axis.ax.fx(b.xmin), ad.axis.ax.fx(b.xmax), ad.axis.ax.fy(b.ymin), ad.axis.ax.fy(b.ymax)); kw...)
 end
 
 

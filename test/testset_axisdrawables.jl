@@ -1,5 +1,5 @@
 
-plotpath(x) = joinpath(ENV["HOME"], "/tmp/", x)
+plotpath(x) = joinpath(ENV["HOME"], "plots/", x)
 
 function main()
     @testset "PlotKitAxes.AxisDrawables" begin
@@ -14,12 +14,16 @@ function main1()
 
     margins = (80,80,80,80)  # l,r,t,b
     yoriginatbottom = true
+    xticksatright = false
     axisequal = false
+    drawbackground = true
+    windowbackgroundcolor = Color(0.8, 0.8, 1)
     box = Box(0,1,0,1)
     axismap = AxisMap(width, height, margins, box, axisequal, yoriginatbottom)
     ticks = Ticks(box, 10, 10)
     as = AxisStyle()
-    axis = Axis(axismap, box, ticks, as, yoriginatbottom)
+    axis = Axis(axismap, box, ticks, as, yoriginatbottom, xticksatright, width, height,
+                drawbackground, windowbackgroundcolor)
 
     # drawing
     dw = Drawable(width, height; fname)

@@ -6,7 +6,7 @@ using ..PlotKitCairo: Box, Point, Color, Drawable, LineStyle, source, set_linest
 using ..MakeAxisMap: @plotfns, AxisMap
 using ..MakeTicks: Ticks
 
-export Axis, AxisStyle, drawaxis, setclipbox
+export Axis, AxisStyle, drawaxis, setclipbox, drawaxisbox
 
 ##############################################################################
 
@@ -31,6 +31,10 @@ Base.@kwdef mutable struct AxisStyle
     drawvgridlines = true
     drawhgridlines = true
     title = ""
+    titlefontsize = 13
+    titlefontname = "Sans"
+    titlefontcolor = Color(:black)
+    titlevoffset = 15
 end
 
 mutable struct Axis
@@ -111,19 +115,28 @@ function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle, yorigin
         end
     end
     if as.drawbox
-        Cairo.move_to(ctx, rfx(xmin)-0.5, rfy(ymax)-0.5)  #tl
-        Cairo.line_to(ctx, rfx(xmin)-0.5, rfy(ymin)+0.5)  #bl
-        Cairo.line_to(ctx, rfx(xmax)+0.5, rfy(ymin)+0.5)  #br
-        Cairo.line_to(ctx, rfx(xmax)+0.5, rfy(ymax)-0.5)  #tr
-        Cairo.close_path(ctx)
-        set_linestyle(ctx, as.edgelinestyle)
-        Cairo.stroke(ctx)
+        drawaxisbox(ctx, axismap, box, as)
     end
-    text(ctx, Point(fx((xmin+xmax)/2), fy(ymax) + 15), as.fontsize, as.fontcolor, as.title;
-         fname = as.fontname, horizontal = "center")
+    text(ctx, Point(fx((xmin+xmax)/2), fy(ymax) + as.titlevoffset), as.titlefontsize, as.titlefontcolor, as.title;
+         fname = as.titlefontname, horizontal = "center")
     
 end
 
+function drawaxisbox(ctx::CairoContext, axismap, box, as::AxisStyle)
+    xmin, xmax, ymin, ymax = box.xmin, box.xmax, box.ymin, box.ymax
+    @plotfns(axismap)
+    Cairo.move_to(ctx, rfx(xmin)-0.5, rfy(ymax)-0.5)  #tl
+    Cairo.line_to(ctx, rfx(xmin)-0.5, rfy(ymin)+0.5)  #bl
+    Cairo.line_to(ctx, rfx(xmax)+0.5, rfy(ymin)+0.5)  #br
+    Cairo.line_to(ctx, rfx(xmax)+0.5, rfy(ymax)-0.5)  #tr
+    Cairo.close_path(ctx)
+    set_linestyle(ctx, as.edgelinestyle)
+    Cairo.stroke(ctx)
+end
+
+
+drawaxisbox(ctx::CairoContext, axis::Axis) = drawaxisbox(ctx, axis.ax, axis.box, axis.as)
+drawaxisbox(dw::Drawable, args...) = drawaxisbox(dw.ctx, args...)
 
 drawaxis(ctx::CairoContext, axis::Axis) = drawaxis(ctx, axis.ax, axis.ticks, axis.box, axis.as, axis.yoriginatbottom,
                                                    axis.xticksatright)
