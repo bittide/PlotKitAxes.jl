@@ -191,6 +191,9 @@ flat(pl::Vector{PointList}) = PointList(reduce(vcat, a.points for a in pl))
 
 function fit_box_around_data(p::PointList, box0::Box)
     truncdata = remove_data_outside_box(p, box0)
+    if length(truncdata.points) == 0
+        return Box(0,1,0,1)
+    end
     boxtmp = smallest_box_containing_data(truncdata)
     box1 = iffinite(box0, boxtmp)
 end
