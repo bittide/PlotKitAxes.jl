@@ -8,7 +8,7 @@ using ..DrawAxis: Axis, DrawAxis, AxisStyle
 using ..MakeTicks: Ticks, get_tick_extents
 using ..MakeAxisMap: AxisMap, @plotfns
 
-export AxisOptions, PointList, allowed_kws, colorbar, input, setoptions!, smallest_box_containing_data
+export AxisOptions, PointList, allowed_kws, colorbar, input, setoptions!, smallest_box_containing_data, ifnotmissing, getbox
 
 
 mutable struct PointList
