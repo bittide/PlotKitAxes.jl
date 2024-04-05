@@ -18,9 +18,6 @@ module PlotKitAxes
 ##############################################################################
 # submodules
 
-# The included modules are sorted by dependency.
-using Cairo
-using PlotKitCairo
 
 # MakeTicks, MakeAxisMap and DrawAxis are ordered by dependency
 include("maketicks.jl")
@@ -34,9 +31,6 @@ using .DrawAxis
 
 include("axisdrawables.jl")
 using .AxisDrawables
-
-# include("dataset.jl")
-# using .DataSet
 
 include("axisbuilder.jl")
 using .AxisBuilder
@@ -52,12 +46,11 @@ function reexport(m)
 end
 
 
-reexport(PlotKitCairo)
+
 reexport(MakeTicks)
 reexport(MakeAxisMap)
 reexport(DrawAxis)
 reexport(AxisDrawables)
-#reexport(DataSet)
 reexport(AxisBuilder)
 reexport(ColorBar)
 
