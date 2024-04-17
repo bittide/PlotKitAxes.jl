@@ -25,6 +25,8 @@ export colorbar, categoricalcolorbar
 # colorbar
 
 
+#
+# cmin, cmax just specify the axes limits
 function colorbar(g::Gradient; cmin = 0, cmax = 1, kw...)
     ad = AxisDrawable(Box(0, 1, cmin, cmax); width = 200,
                       axisstyle_drawxlabels = false,
@@ -36,6 +38,9 @@ function colorbar(g::Gradient; cmin = 0, cmax = 1, kw...)
     drawaxis(ad)
     setclipbox(ad)
     pat = linear_pattern(ad, Point(0,cmin), Point(0,cmax))
+
+    # stops should be in the interval [0,1]
+    # and specify the position along the colorbar of the colors
     for i =1:length(g.colors)
         add_color_stop(pat, g.stops[i], g.colors[i])
     end
