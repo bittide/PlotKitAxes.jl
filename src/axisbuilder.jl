@@ -72,6 +72,7 @@ Base.@kwdef mutable struct AxisOptions
     axisstyle = AxisStyle()
     tickbox = Box()
     axisbox = Box()
+    tight = false
 end
 
 ##############################################################################
@@ -107,8 +108,14 @@ function DrawAxis.Axis(databox::Box, ao::AxisOptions)
 
     # axisbox is set to the actual min and max of the values of the ticks
     # and determines the extent of the axis region of the plot
-    axisbox = ifnotmissing(ao.axisbox, get_tick_extents(ticks))
+    if ao.tight
+        axisbox = expand_box(databox, ao.xdatamargin, ao.ydatamargin)
+    else
+        axisbox = ifnotmissing(ao.axisbox, get_tick_extents(ticks))
+    end
 
+
+    
     # set window width/height based on axis limits
     # if asked to do so
     width, height = set_window_size_from_data(ao.width, ao.height, axisbox, margins(ao),
