@@ -15,7 +15,7 @@
 module MakeTicks
 
 using Cairo
-using PlotKitCairo: Box
+using PlotKitCairo: Box, ifnotmissing, PlotKitCairo
 
 export Ticks, best_ticks, best_labels, get_tick_extents
 
@@ -37,6 +37,13 @@ function Ticks(xmin, xmax, ymin, ymax, xidealnumlabels, yidealnumlabels)
     yl = best_labels(yt)
     ticks =  Ticks(xt, xl, yt, yl)
     return  ticks
+end
+
+function PlotKitCairo.ifnotmissing(a::Ticks, b::Ticks)
+    return Ticks(ifnotmissing(a.xticks, b.xticks),
+                 ifnotmissing(a.xtickstrings, b.xtickstrings),
+                 ifnotmissing(a.yticks, b.yticks),
+                 ifnotmissing(a.ytickstrings, b.ytickstrings))
 end
 
 # b is a box in data units

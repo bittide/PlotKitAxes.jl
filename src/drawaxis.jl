@@ -93,7 +93,8 @@ function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle, yorigin
                 Cairo.stroke(ctx)
             end
         end
-        if xt>=xmin && xt<=xmax
+        dx = 0.001*(xmax-xmin)
+        if xt >= xmin - dx && xt <= xmax + dx
             if as.drawxlabels
                 ypos = fy(ymin) + as.xtickverticaloffset
                 if !yoriginatbottom
@@ -115,7 +116,8 @@ function drawaxis(ctx::CairoContext, axismap, ticks, box, as::AxisStyle, yorigin
                 Cairo.stroke(ctx)
             end
         end
-        if yt>=ymin && yt<=ymax
+        dy = 0.001*(ymax-ymin)
+        if yt >= ymin - dy && yt <= ymax + dy
             if as.drawylabels
                 xpos = fx(xmin) + as.ytickhorizontaloffset
                 if xticksatright

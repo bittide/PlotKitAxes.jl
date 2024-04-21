@@ -14,23 +14,15 @@
 
 module AxisBuilder
 
-using PlotKitCairo: Drawable, Box, Point, Drawable, Color, inbox, expand_box, scale_box
+using PlotKitCairo: Drawable, Box, Point, PointList, Drawable, Color, getbox, inbox, expand_box, iffinite, ifnotmissing, remove_data_outside_box, scale_box, setoptions!, smallest_box_containing_data
 
 using ..AxisDrawables: AxisDrawable, AxisDrawables
 using ..DrawAxis: Axis, DrawAxis, AxisStyle
 using ..MakeTicks: Ticks, get_tick_extents
 using ..MakeAxisMap: AxisMap, @plotfns
 
-export AxisOptions, PointList, allowed_kws, colorbar, input, setoptions!, smallest_box_containing_data, ifnotmissing, getbox
+export AxisOptions, colorbar
 
-
-mutable struct PointList
-    points::Vector{Point}
-end
-
-# input returns a vector of pointlists
-input(data::Vector{Point}) = [PointList(data)]
-input(data::Array{Vector{Point}}) = [PointList(p) for p in data[:]]
 
 
 #
@@ -104,7 +96,7 @@ function DrawAxis.Axis(databox::Box, ao::AxisOptions)
     # tickbox used to define the minimum area which the ticks
     # are guaranteed to contain
     # Ticks is a set of ticks chosen to be pretty, and to contain tickbox
-    ticks = ifnotmissingticks(ao.ticks, Ticks(tickbox,  ao.xidealnumlabels, ao.yidealnumlabels))
+    ticks = ifnotmissing(ao.ticks, Ticks(tickbox,  ao.xidealnumlabels, ao.yidealnumlabels))
 
     # axisbox is set to the actual min and max of the values of the ticks
     # and determines the extent of the axis region of the plot
@@ -201,8 +193,6 @@ end
 
 ##############################################################################
 
-flat(pl::PointList) = pl
-flat(pl::Vector{PointList}) = PointList(reduce(vcat, a.points for a in pl))
   
 # used when you don't have any data and want to ask
 # for specific limits on the axis
@@ -232,54 +222,10 @@ end
 
 
 
-function iffinite(r::Number, d::Number)
-    if isfinite(r)
-        return r
-    end
-    return d
-end
-
-# if requested limits are finite, use them
-function iffinite(a::Box, b::Box)
-    xmin = iffinite(a.xmin, b.xmin)
-    xmax = iffinite(a.xmax, b.xmax)
-    ymin = iffinite(a.ymin, b.ymin)
-    ymax = iffinite(a.ymax, b.ymax)
-    return Box(xmin, xmax, ymin, ymax)
-end
-
-remove_data_outside_box(pl::PointList, box::Box) = PointList(Point[a for a in pl.points if inbox(a, box)])
-
-function smallest_box_containing_data(pl::PointList)
-    xmin = minimum(a.x for a in pl.points)
-    xmax = maximum(a.x for a in pl.points)
-    ymin = minimum(a.y for a in pl.points)
-    ymax = maximum(a.y for a in pl.points)
-    return Box(xmin, xmax, ymin, ymax)
-end
-
 
 ##############################################################################
 # utilities
 
-
-ifnotmissing(x::Missing, y) = y
-ifnotmissing(x, y) = x
-
-function ifnotmissing(a::Box, b::Box)
-    return Box(ifnotmissing(a.xmin, b.xmin),
-               ifnotmissing(a.xmax, b.xmax),
-               ifnotmissing(a.ymin, b.ymin),
-               ifnotmissing(a.ymax, b.ymax))
-end
-
-
-function ifnotmissingticks(a::Ticks, b::Ticks)
-    return Ticks(ifnotmissing(a.xticks, b.xticks),
-                 ifnotmissing(a.xtickstrings, b.xtickstrings),
-                 ifnotmissing(a.yticks, b.yticks),
-                 ifnotmissing(a.ytickstrings, b.ytickstrings))
-end
 
 margins(a) = (a.lmargin, a.rmargin, a.tmargin, a.bmargin)
 
@@ -289,37 +235,8 @@ margins(a) = (a.lmargin, a.rmargin, a.tmargin, a.bmargin)
 ##############################################################################
 # keyword args
 
-function symsplit(s::Symbol, a::String)
-    n = length(a)
-    st = string(s)
-    if length(st) > n && st[1:length(a)] == a
-        return true, Symbol(st[length(a)+1:end])
-    end
-    return false, :nosuchsymbol
-end
-
-function setoptions!(d, prefix, kwargs...)
-    for (key, value) in kwargs
-        match, tail = symsplit(key, prefix)
-        if match && tail in fieldnames(typeof(d))
-            setfield!(d, tail, value)
-        end
-    end
-end
-
-# For a type T defined using @kwdef, this function returns the fieldnames
-# which can be sent as kw arguments to its constructor
-# So you can call 
-#
-#  T(; allowed_kws(T, kw)...)
-#
-# when kw is supplied from the kwargs of a function call
-#
-allowed_kws(T, kw) = Dict(a => kw[a] for a in keys(kw) if a in fieldnames(T))
-
 ##############################################################################
 
-getbox(a) = Box(a.xmin, a.xmax, a.ymin, a.ymax)
 
 
 
