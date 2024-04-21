@@ -1,7 +1,7 @@
 name = "PlotKitAxes"
 authors = ["Sanjay Lall <sanjaylall@google.com>"]
 uuid = "d206e830-6474-4927-8e6c-338e8092c5c7"
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 PlotKitCairo = "7ee0c3d4-a3be-4a4f-8af9-251da1807123"
