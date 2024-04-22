@@ -14,7 +14,7 @@
 
 module AxisBuilder
 
-using PlotKitCairo: Drawable, Box, Point, PointList, Drawable, Color, getbox, inbox, expand_box, iffinite, ifnotmissing, remove_data_outside_box, scale_box, setoptions!, smallest_box_containing_data
+using PlotKitCairo: Drawable, Box, Point, PointList, Drawable, Color, getbox, inbox, expand_box, flat, iffinite, ifnotmissing, remove_data_outside_box, scale_box, setoptions!, smallest_box_containing_data
 
 using ..AxisDrawables: AxisDrawable, AxisDrawables
 using ..DrawAxis: Axis, DrawAxis, AxisStyle
