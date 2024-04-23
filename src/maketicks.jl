@@ -122,24 +122,28 @@ function labelsequal(x, l)
 end
 
 # given a list of numbers, convert to a list of strings
-function best_labels(x::Array{Integer,1}, suffix = "")
+function best_labels(x::Array{Integer,1}, suffix = 0)
     y = string.(x)
-    y[end] *= suffix
+    if suffix != 0
+        y[end] *= "e$(suffix)"
+    end
     return y
 end
     
 
-function best_labels(x::Array{Float64,1}, suffix = "")
+function best_labels(x::Array{Float64,1}, suffix = 0)
     if maximum(abs.(x)) > 10^6 && maximum(x) - minimum(x) > 10^7
-        return best_labels(x ./ 10^6, "e6")
+        return best_labels(x ./ 10^6, suffix + 6)
     end
     if maximum(abs.(x)) < 10^-6
-        return best_labels(x .* 10^6, "e-6")
+        return best_labels(x .* 10^6, suffix - 6)
     end
     for p in 0:20
         plabels = num_to_string.(x, p)
         if labelsequal(x, plabels)
-            plabels[end] *= suffix
+            if suffix != 0
+                plabels[end] *= "e$(suffix)"
+            end
             return plabels
         end
     end
